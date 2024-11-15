@@ -1,11 +1,13 @@
 from flask import Flask, jsonify, request, render_template
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.exc import OperationalError
 from sqlalchemy import func
 from flask_cors import CORS
 from datetime import datetime
 
 app = Flask(__name__)
-CORS(app)
+# Configurar CORS para permitir o domínio específico
+CORS(app)  # sem restrições
 
 # Configuração do banco de dados MySQL
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:793415Ng_@localhost:3306/sistema_de_tarefas'
@@ -32,10 +34,16 @@ class Task(db.Model):
             'ordem': self.ordem
         }
 
-# Rota para a raiz
 @app.route('/')
 def index():
-    return render_template('index.html')
+    try:
+        # Tenta realizar a conexão com o banco de dados
+        db.engine.connect()
+        print("Conexão de sucesso com o banco de dados!")  # Mensagem no terminal
+        return "Conexão de sucesso com o banco de dados!"  # Resposta para o frontend
+    except OperationalError as e:
+        print(f"Erro ao conectar com o banco de dados: {str(e)}")  # Mensagem de erro no terminal
+        return f"Erro ao conectar com o banco de dados: {str(e)}"  # Resposta para o frontend
 
 # Rota para obter todas as tarefas
 @app.route('/tasks', methods=['GET'])
