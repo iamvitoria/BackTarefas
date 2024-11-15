@@ -37,12 +37,11 @@ class Task(db.Model):
 @app.route('/')
 def index():
     try:
-        # Tenta realizar a conexão com o banco de dados
         db.engine.connect()
-        print("Conexão de sucesso com o banco de dados!")  # Mensagem no terminal
+        print("Conexão de sucesso com o banco de dados!")
         return "Conexão de sucesso com o banco de dados!"  # Resposta para o frontend
     except OperationalError as e:
-        print(f"Erro ao conectar com o banco de dados: {str(e)}")  # Mensagem de erro no terminal
+        print(f"Erro ao conectar com o banco de dados: {str(e)}")
         return f"Erro ao conectar com o banco de dados: {str(e)}"  # Resposta para o frontend
 
 # Rota para obter todas as tarefas
