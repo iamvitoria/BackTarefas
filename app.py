@@ -7,7 +7,7 @@ from datetime import datetime
 
 app = Flask(__name__)
 # Configurar CORS para permitir o domínio específico
-CORS(app)  # sem restrições
+CORS(app, resources={r"/*": {"origins": "https://iamviitoria.github.io"}})
 
 # Configuração do banco de dados MySQL
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:793415Ng_@localhost:3306/sistema_de_tarefas'
