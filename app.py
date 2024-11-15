@@ -1,13 +1,12 @@
-from flask import Flask, jsonify, request, render_template
+from flask import Flask, jsonify, request, make_response
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.exc import OperationalError
-from sqlalchemy import func
 from flask_cors import CORS
 from datetime import datetime
 
 app = Flask(__name__)
+
 # Configurar CORS para permitir o domínio específico
-CORS(app, resources={r"/*": {"origins": "https://iamviitoria.github.io"}})
+CORS(app, resources={r"/*": {"origins": "https://iamvitoria.github.io"}})
 
 # Configuração do banco de dados MySQL
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:793415Ng_@localhost:3306/sistema_de_tarefas'
@@ -47,8 +46,10 @@ def index():
 # Rota para obter todas as tarefas
 @app.route('/tasks', methods=['GET'])
 def get_tasks():
-    tasks = Task.query.order_by(Task.ordem).all()  # Ordena por 'ordem'
-    return jsonify([task.to_dict() for task in tasks])
+    tasks = Task.query.order_by(Task.ordem).all()
+    response = make_response(jsonify([task.to_dict() for task in tasks]))
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    return response
 
 # Rota para obter uma tarefa específica pelo ID
 @app.route('/tasks/<int:task_id>', methods=['GET'])
@@ -118,6 +119,15 @@ def reorder_task(task_id, direction):
         return jsonify({'message': 'Reordered successfully'}), 200
     else:
         return jsonify({'error': 'Cannot reorder in this direction'}), 400
+
+# Rota OPTIONS para CORS
+@app.route('/tasks', methods=['OPTIONS'])
+def options_tasks():
+    response = make_response('', 200)
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE'
+    response.headers['Access-Control-Allow-Headers'] = 'Content-Type'
+    return response
 
 # Criar as tabelas no banco de dados
 with app.app_context():
