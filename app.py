@@ -2,6 +2,8 @@ from flask import Flask, jsonify, request, make_response
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from datetime import datetime
+from sqlalchemy.exc import OperationalError
+from sqlalchemy import func
 
 app = Flask(__name__)
 
@@ -37,11 +39,9 @@ class Task(db.Model):
 def index():
     try:
         db.engine.connect()
-        print("Conexão de sucesso com o banco de dados!")
         return "Conexão de sucesso com o banco de dados!"  # Resposta para o frontend
     except OperationalError as e:
-        print(f"Erro ao conectar com o banco de dados: {str(e)}")
-        return f"Erro ao conectar com o banco de dados: {str(e)}"  # Resposta para o frontend
+        return f"Erro ao conectar com o banco de dados: {str(e)}"
 
 # Rota para obter todas as tarefas
 @app.route('/tasks', methods=['GET'])
@@ -71,7 +71,6 @@ def add_task():
         return jsonify(new_task.to_dict()), 201
     except Exception as e:
         db.session.rollback()  # Reverte a sessão em caso de erro
-        print(f"Erro ao adicionar tarefa: {e}")
         return jsonify({'error': str(e)}), 500
 
 # Rota para editar uma tarefa
@@ -90,7 +89,6 @@ def edit_task(task_id):
         return jsonify(task.to_dict())
     except Exception as e:
         db.session.rollback()
-        print(f"Erro ao editar tarefa: {e}")
         return jsonify({'error': str(e)}), 500
 
 # Rota para deletar uma tarefa
